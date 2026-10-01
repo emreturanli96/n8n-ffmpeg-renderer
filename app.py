@@ -191,6 +191,7 @@ def render_video():
             "scale=1080:1920:"
             "force_original_aspect_ratio=increase,"
             "crop=1080:1920,"
+            "format=yuv420p,"
             "fps=30"
         )
 
@@ -230,7 +231,7 @@ def render_video():
             "-preset", "ultrafast",
             "-tune", "stillimage",
             "-crf", "23",
-            "-threads", "2",
+            "-threads", "1",
             "-pix_fmt", "yuv420p",
             "-c:a", "aac",
             "-b:a", "128k",
