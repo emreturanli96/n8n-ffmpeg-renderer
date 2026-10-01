@@ -217,17 +217,23 @@ def render_video():
         command = [
             "ffmpeg",
             "-y",
+            "-nostats",
+            "-loglevel", "error",
+            "-threads", "2",
             "-f", "concat",
             "-safe", "0",
             "-i", concat_path,
             "-i", audio_path,
             "-vf", vf,
+            "-filter_threads", "1",
             "-c:v", "libx264",
-            "-preset", "veryfast",
+            "-preset", "ultrafast",
+            "-tune", "stillimage",
             "-crf", "23",
+            "-threads", "2",
             "-pix_fmt", "yuv420p",
             "-c:a", "aac",
-            "-b:a", "192k",
+            "-b:a", "128k",
             "-shortest",
             "-movflags", "+faststart",
             output_path
@@ -238,7 +244,8 @@ def render_video():
             check=True,
             cwd=workdir,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+            stderr=subprocess.PIPE,
+            timeout=540
         )
 
         return send_file(
@@ -247,6 +254,11 @@ def render_video():
             as_attachment=True,
             download_name="short.mp4"
         )
+
+    except subprocess.TimeoutExpired:
+        return jsonify({
+            "error": "Render timed out"
+        }), 504
 
     except subprocess.CalledProcessError as e:
         return jsonify({
